@@ -56,7 +56,43 @@ def organize_files(target_folder):
             shutil.move(file_path, os.path.join(other_folder, file))
             print(f"Moved: {file} → Others")
 
+def restore_files(target_folder):
+    """
+    Moves files back from category folders into the main folder
+    and deletes empty folders.
+    """
+    if not target_folder:
+        print("No folder selected. Exiting...")
+        return
+
+    for folder in os.listdir(target_folder):
+        folder_path = os.path.join(target_folder, folder)
+
+        # Only process folders we created
+        if os.path.isdir(folder_path) and folder in list(FILE_TYPES.keys()) + ["Others"]:
+            for file in os.listdir(folder_path):
+                src = os.path.join(folder_path, file)
+                dst = os.path.join(target_folder, file)
+                shutil.move(src, dst)
+                print(f"Restored: {file}")
+
+            # Remove empty folder
+            os.rmdir(folder_path)
+
+    print("Folder restored to original state.")
+
 
 if __name__ == "__main__":
     selected_folder = choose_folder()
-    organize_files(selected_folder)
+
+    choice = input(
+        "Type O to organize files or R to restore files: "
+    ).strip().upper()
+
+    if choice == "O":
+        organize_files(selected_folder)
+    elif choice == "R":
+        restore_files(selected_folder)
+    else:
+        print("Invalid option.")
+
